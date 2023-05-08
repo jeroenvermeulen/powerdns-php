@@ -187,9 +187,9 @@ class ResourceRecord
      *
      * @param string $changeType The desired change type.
      *
+     * @return $this The current ResourceRecord instance.
      * @throws InvalidChangeType If the given change type is invalid.
      *
-     * @return $this The current ResourceRecord instance.
      */
     public function setChangeType(string $changeType): self
     {
@@ -243,9 +243,9 @@ class ResourceRecord
      * Get the name of the resource record without the domain name.
      * "@" when empty.
      *
+     * @return string The short name
      * @throws PowerdnsException If it is not possible to shorten the name.
      *
-     * @return string The short name
      */
     public function getShortName(): string
     {
@@ -363,9 +363,9 @@ class ResourceRecord
      *
      * @param string $type The type.
      *
+     * @return $this The current ResourceRecord instance.
      * @throws InvalidRecordType If the record type can not be changed or is invalid.
      *
-     * @return $this The current ResourceRecord instance.
      */
     public function setType(string $type): self
     {
@@ -380,8 +380,17 @@ class ResourceRecord
 
         if ((new ReflectionClass(RecordType::class))->getConstant($type) !== false) {
             $this->type = $type;
-
             return $this;
+        }
+
+        $unknownTypeRegex = '/^' . preg_quote(RecordType::unknownTypePrefix, '/') . '(\d+)$/';
+        if (preg_match($unknownTypeRegex, $type, $matches)) {
+            if (is_numeric($matches[1]) &&
+                intval($matches[1]) >= RecordType::privateTypeMin &&
+                intval($matches[1]) <= RecordType::privateTypeMax) {
+                $this->type = $type;
+                return $this;
+            }
         }
 
         throw new InvalidRecordType(sprintf('The record type [%s] is not a valid DNS Record type.', $type));
