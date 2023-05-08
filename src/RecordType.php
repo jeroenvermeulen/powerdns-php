@@ -316,5 +316,5 @@ class RecordType
      * Maximum type number for a Private resource record.
      * https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
      */
-    public const privateTypeMax = 65535;
+    public const privateTypeMax = 65534;
 }
